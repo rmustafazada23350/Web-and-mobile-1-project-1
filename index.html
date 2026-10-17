@@ -13,7 +13,22 @@
     </header>
     <main class="app-container">
         <section class="map-section">
-            <!-- Map and controls will go here in later commits -->
+            <aside class="sidebar">
+                <div class="panel inspection-panel">
+                    <h2>Seat Inspection</h2>
+                    <div id="inspection-details">
+                        <p class="empty-message">Click on an available seat on the map to inspect its details.</p>
+                    </div>
+                    <button id="btn-add-cart" class="action-btn" disabled>ADD TO CART</button>
+                </div>
+                <div class="panel cart-panel">
+                    <h2>Your Cart</h2>
+                    <ul id="cart-items" class="cart-items"></ul>
+                    <div class="cart-summary">
+                        <span>Total:</span><span id="cart-total" class="total-price">$0</span>
+                    </div>
+                </div>
+            </aside>
         </section>
     </main>
 
