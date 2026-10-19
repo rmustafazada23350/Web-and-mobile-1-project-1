@@ -18,5 +18,50 @@ const PAN_STEP = 50; const ZOOM_STEP = 0.2;
 const MIN_ZOOM = 0.4; const MAX_ZOOM = 3;
 
 document.addEventListener('DOMContentLoaded', () => {
-    
+    function generateVenueModel() {
+        venueData.forEach(zone => {
+            for (let r = 1; r <= zone.rows; r++) {
+                for (let c = 1; c <= zone.cols; c++) {
+                    const seatId = `${zone.id}-R${r}-S${c}`;
+                    const isUnavailable = unavailableSeats.includes(seatId);
+                    seatsModel[seatId] = {
+                        id: seatId, zoneName: zone.name, row: r, col: c, price: zone.price,
+                        status: isUnavailable ? 'unavailable' : (cart.includes(seatId) ? 'in-cart' : 'available')
+                    };
+                }
+            }
+        });
+    }
+
+    function renderVenueMap() {
+        const venueContainer = document.getElementById('venue-zones');
+        venueContainer.innerHTML = '';
+        venueData.forEach(zone => {
+            const zoneDiv = document.createElement('div');
+            zoneDiv.className = 'zone-container';
+            const title = document.createElement('div');
+            title.className = 'zone-title';
+            title.innerText = `${zone.name} - $${zone.price}`;
+            zoneDiv.appendChild(title);
+            const gridDiv = document.createElement('div');
+            gridDiv.className = 'seat-grid';
+            for (let r = 1; r <= zone.rows; r++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'seat-row';
+                for (let c = 1; c <= zone.cols; c++) {
+                    const seatId = `${zone.id}-R${r}-S${c}`;
+                    const seatData = seatsModel[seatId];
+                    const seatBtn = document.createElement('button');
+                    seatBtn.className = `seat ${seatData.status}`;
+                    seatBtn.dataset.id = seatId;
+                    seatBtn.title = `${seatData.zoneName}, Row ${r}, Seat ${c} - $${seatData.price}`;
+                    if (seatData.status === 'unavailable') seatBtn.disabled = true;
+                    rowDiv.appendChild(seatBtn);
+                }
+                gridDiv.appendChild(rowDiv);
+            }
+            zoneDiv.appendChild(gridDiv);
+            venueContainer.appendChild(zoneDiv);
+        });
+    }
 });
