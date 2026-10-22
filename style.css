@@ -136,3 +136,133 @@ header p {
   flex: 1;
   min-height: 0;
 }
+
+.map-window {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    background-color: var(--bg-map);
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.map-window:active {
+    cursor: grabbing;
+}
+
+.venue-map {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+
+#venue-zones {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+.zone-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.zone-title {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+.seat-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.seat-row {
+    display: flex;
+    gap: 0.4rem;
+    justify-content: center;
+}
+
+.seat {
+    width: 25px;
+    height: 25px;
+    border-radius: 4px 4px 8px 8px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    background-color: var(--seat-available);
+    cursor: pointer;
+}
+
+.seat:hover:not(.unavailable):not(.in-cart):not(.inspected) {
+    transform: scale(1.1);
+    background-color: #94a3b8;
+}
+
+.seat.inspected {
+    background-color: var(--seat-inspected);
+    border-color: #d97706;
+    box-shadow: 0 0 6px rgba(245, 158, 11, 0.8);
+    transform: scale(1.1);
+}
+
+.seat.in-cart {
+    background-color: var(--seat-incart);
+    border-color: var(--blue-dark);
+}
+
+.seat.unavailable {
+    background-color: var(--seat-unavailable);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.legend {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.6rem 1.2rem;
+    padding: 0.8rem 1rem;
+    background-color: #f8fafc;
+    border-top: 1px solid var(--border-color);
+    font-size: 0.85rem;
+    color: var(--text-main);
+    font-weight: 500;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.seat-sample {
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+    border-radius: 2px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.seat-sample.available {
+    background-color: var(--seat-available);
+}
+
+.seat-sample.inspected {
+    background-color: var(--seat-inspected);
+}
+
+.seat-sample.in-cart {
+    background-color: var(--seat-incart);
+}
+
+.seat-sample.unavailable {
+    background-color: var(--seat-unavailable);
+    opacity: 0.5;
+}
