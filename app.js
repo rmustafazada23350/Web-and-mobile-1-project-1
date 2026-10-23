@@ -18,50 +18,89 @@ const PAN_STEP = 50; const ZOOM_STEP = 0.2;
 const MIN_ZOOM = 0.4; const MAX_ZOOM = 3;
 
 document.addEventListener('DOMContentLoaded', () => {
-    function generateVenueModel() {
-        venueData.forEach(zone => {
-            for (let r = 1; r <= zone.rows; r++) {
-                for (let c = 1; c <= zone.cols; c++) {
-                    const seatId = `${zone.id}-R${r}-S${c}`;
-                    const isUnavailable = unavailableSeats.includes(seatId);
-                    seatsModel[seatId] = {
-                        id: seatId, zoneName: zone.name, row: r, col: c, price: zone.price,
-                        status: isUnavailable ? 'unavailable' : (cart.includes(seatId) ? 'in-cart' : 'available')
-                    };
-                }
+    generateVenueModel();
+    renderVenueMap();
+    setupEventListeners();
+});
+
+function generateVenueModel() {
+    venueData.forEach(zone => {
+        for (let r = 1; r <= zone.rows; r++) {
+            for (let c = 1; c <= zone.cols; c++) {
+                const seatId = `${zone.id}-R${r}-S${c}`;
+                const isUnavailable = unavailableSeats.includes(seatId);
+                seatsModel[seatId] = {
+                    id: seatId, zoneName: zone.name, row: r, col: c, price: zone.price,
+                    status: isUnavailable ? 'unavailable' : (cart.includes(seatId) ? 'in-cart' : 'available')
+                };
             }
-        });
+        }
+    });
+}
+
+function renderVenueMap() {
+    const venueContainer = document.getElementById('venue-zones');
+    venueContainer.innerHTML = '';
+    venueData.forEach(zone => {
+        const zoneDiv = document.createElement('div');
+        zoneDiv.className = 'zone-container';
+        const title = document.createElement('div');
+        title.className = 'zone-title';
+        title.innerText = `${zone.name} - $${zone.price}`;
+        zoneDiv.appendChild(title);
+        const gridDiv = document.createElement('div');
+        gridDiv.className = 'seat-grid';
+        for (let r = 1; r <= zone.rows; r++) {
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'seat-row';
+            for (let c = 1; c <= zone.cols; c++) {
+                const seatId = `${zone.id}-R${r}-S${c}`;
+                const seatData = seatsModel[seatId];
+                const seatBtn = document.createElement('button');
+                seatBtn.className = `seat ${seatData.status}`;
+                seatBtn.dataset.id = seatId;
+                seatBtn.title = `${seatData.zoneName}, Row ${r}, Seat ${c} - $${seatData.price}`;
+                if (seatData.status === 'unavailable') seatBtn.disabled = true;
+                rowDiv.appendChild(seatBtn);
+            }
+            gridDiv.appendChild(rowDiv);
+        }
+        zoneDiv.appendChild(gridDiv);
+        venueContainer.appendChild(zoneDiv);
+    });
+}
+
+function handleSeatClick(seatId) {
+    const seatData = seatsModel[seatId];
+    if (seatData.status === 'unavailable' || seatData.status === 'in-cart') return;
+
+    if (inspectedSeatId && seatsModel[inspectedSeatId].status === 'inspected') {
+        seatsModel[inspectedSeatId].status = 'available';
+        updateSeatUI(inspectedSeatId);
     }
 
-    function renderVenueMap() {
-        const venueContainer = document.getElementById('venue-zones');
-        venueContainer.innerHTML = '';
-        venueData.forEach(zone => {
-            const zoneDiv = document.createElement('div');
-            zoneDiv.className = 'zone-container';
-            const title = document.createElement('div');
-            title.className = 'zone-title';
-            title.innerText = `${zone.name} - $${zone.price}`;
-            zoneDiv.appendChild(title);
-            const gridDiv = document.createElement('div');
-            gridDiv.className = 'seat-grid';
-            for (let r = 1; r <= zone.rows; r++) {
-                const rowDiv = document.createElement('div');
-                rowDiv.className = 'seat-row';
-                for (let c = 1; c <= zone.cols; c++) {
-                    const seatId = `${zone.id}-R${r}-S${c}`;
-                    const seatData = seatsModel[seatId];
-                    const seatBtn = document.createElement('button');
-                    seatBtn.className = `seat ${seatData.status}`;
-                    seatBtn.dataset.id = seatId;
-                    seatBtn.title = `${seatData.zoneName}, Row ${r}, Seat ${c} - $${seatData.price}`;
-                    if (seatData.status === 'unavailable') seatBtn.disabled = true;
-                    rowDiv.appendChild(seatBtn);
-                }
-                gridDiv.appendChild(rowDiv);
-            }
-            zoneDiv.appendChild(gridDiv);
-            venueContainer.appendChild(zoneDiv);
-        });
-    }
-});
+    inspectedSeatId = seatId;
+    seatsModel[seatId].status = 'inspected';
+    updateSeatUI(seatId);
+
+    const inspectionDetails = document.getElementById('inspection-details');
+    inspectionDetails.innerHTML = `
+        <div class="inspect-info">
+            <p><strong>Zone:</strong> ${seatData.zoneName}</p>
+            <p><strong>Row:</strong> ${seatData.row} | <strong>Seat:</strong> ${seatData.col}</p>
+            <p><strong>Price:</strong> <span class="highlight-text">$${seatData.price}</span></p>
+        </div>
+    `;
+    document.getElementById('btn-add-cart').disabled = false;
+}
+
+function updateSeatUI(seatId) {
+    const seatElement = document.querySelector(`.seat[data-id="${seatId}"]`);
+    if (seatElement) seatElement.className = `seat ${seatsModel[seatId].status}`;
+}
+
+function setupEventListeners() {
+    document.getElementById('venue-map').addEventListener('click', (e) => {
+        if (e.target.classList.contains('seat')) handleSeatClick(e.target.dataset.id);
+    });
+}
