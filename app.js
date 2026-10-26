@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     generateVenueModel();
     renderVenueMap();
     setupEventListeners();
+    renderCart();
 });
 
 function generateVenueModel() {
@@ -103,4 +104,44 @@ function setupEventListeners() {
     document.getElementById('venue-map').addEventListener('click', (e) => {
         if (e.target.classList.contains('seat')) handleSeatClick(e.target.dataset.id);
     });
+    document.getElementById('btn-add-cart').addEventListener('click', addToCart);
+}
+
+function addToCart() {
+    if (!inspectedSeatId || cart.includes(inspectedSeatId)) return;
+    
+    cart.push(inspectedSeatId);
+    seatsModel[inspectedSeatId].status = 'in-cart';
+    updateSeatUI(inspectedSeatId);
+    
+    inspectedSeatId = null;
+    document.getElementById('inspection-details').innerHTML = `<p class="empty-message">Click on an available seat on the map to inspect its details.</p>`;
+    document.getElementById('btn-add-cart').disabled = true;
+    renderCart();
+}
+
+function renderCart() {
+    const cartItemsContainer = document.getElementById('cart-items');
+    cartItemsContainer.innerHTML = '';
+    let total = 0;
+
+    if (cart.length === 0) {
+        cartItemsContainer.innerHTML = `<li class="empty-message">Your cart is empty.</li>`;
+    } else {
+        cart.forEach(seatId => {
+            const seat = seatsModel[seatId];
+            if (!seat) return;
+            total += seat.price;
+            const li = document.createElement('li');
+            li.className = 'cart-item';
+            li.innerHTML = `
+                <div class="cart-item-details">
+                    <span class="cart-item-title">${seat.zoneName} (${seat.id})</span>
+                    <span class="cart-item-price">$${seat.price}</span>
+                </div>
+            `;
+            cartItemsContainer.prepend(li);
+        });
+    }
+    document.getElementById('cart-total').innerText = `$${total}`;
 }
