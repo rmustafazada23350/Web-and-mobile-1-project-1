@@ -139,9 +139,21 @@ function renderCart() {
                     <span class="cart-item-title">${seat.zoneName} (${seat.id})</span>
                     <span class="cart-item-price">$${seat.price}</span>
                 </div>
+                <button class="remove-btn" onclick="removeFromCart('${seat.id}')">Remove</button>
             `;
             cartItemsContainer.prepend(li);
         });
     }
     document.getElementById('cart-total').innerText = `$${total}`;
+}
+
+function removeFromCart(seatId) {
+    const index = cart.indexOf(seatId);
+    if (index > -1) {
+        cart.splice(index, 1);
+        seatsModel[seatId].status = 'available';
+        updateSeatUI(seatId);
+        if (inspectedSeatId === seatId) inspectedSeatId = null; 
+        renderCart();
+    }
 }
