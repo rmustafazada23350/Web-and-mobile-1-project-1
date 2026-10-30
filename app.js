@@ -18,6 +18,7 @@ const PAN_STEP = 50; const ZOOM_STEP = 0.2;
 const MIN_ZOOM = 0.4; const MAX_ZOOM = 3;
 
 document.addEventListener('DOMContentLoaded', () => {
+    loadCartFromStorage();
     generateVenueModel();
     renderVenueMap();
     setupEventListeners();
@@ -117,7 +118,7 @@ function addToCart() {
     inspectedSeatId = null;
     document.getElementById('inspection-details').innerHTML = `<p class="empty-message">Click on an available seat on the map to inspect its details.</p>`;
     document.getElementById('btn-add-cart').disabled = true;
-    renderCart();
+    saveAndRenderCart();
 }
 
 function renderCart() {
@@ -154,6 +155,27 @@ function removeFromCart(seatId) {
         seatsModel[seatId].status = 'available';
         updateSeatUI(seatId);
         if (inspectedSeatId === seatId) inspectedSeatId = null; 
-        renderCart();
+        saveAndRenderCart();
+    }
+}
+
+function saveAndRenderCart() {
+    localStorage.setItem('venueCart', JSON.stringify(cart));
+    renderCart();
+}
+
+function loadCartFromStorage() {
+    try {
+        const saved = localStorage.getItem('venueCart');
+        if (saved) {
+            const parsedCart = JSON.parse(saved);
+            cart = parsedCart.filter(id => !unavailableSeats.includes(id));
+            if (cart.length !== parsedCart.length) {
+                localStorage.setItem('venueCart', JSON.stringify(cart));
+            }
+        }
+    } catch (error) {
+        cart = [];
+        localStorage.removeItem('venueCart');
     }
 }
