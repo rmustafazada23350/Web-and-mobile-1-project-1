@@ -106,6 +106,13 @@ function setupEventListeners() {
         if (e.target.classList.contains('seat')) handleSeatClick(e.target.dataset.id);
     });
     document.getElementById('btn-add-cart').addEventListener('click', addToCart);
+    document.getElementById('btn-zoom-in').addEventListener('click', () => zoom(ZOOM_STEP));
+    document.getElementById('btn-zoom-out').addEventListener('click', () => zoom(-ZOOM_STEP));
+    document.getElementById('btn-move-up').addEventListener('click', () => pan(0, PAN_STEP));
+    document.getElementById('btn-move-down').addEventListener('click', () => pan(0, -PAN_STEP));
+    document.getElementById('btn-move-left').addEventListener('click', () => pan(PAN_STEP, 0));
+    document.getElementById('btn-move-right').addEventListener('click', () => pan(-PAN_STEP, 0));
+    document.getElementById('btn-reset').addEventListener('click', resetView);
 }
 
 function addToCart() {
@@ -178,4 +185,28 @@ function loadCartFromStorage() {
         cart = [];
         localStorage.removeItem('venueCart');
     }
+}
+
+function applyMapTransform() {
+    const mapEl = document.getElementById('venue-map');
+    if (mapEl) 
+        mapEl.style.transform = `translate(${mapTranslateX}px, ${mapTranslateY}px) scale(${mapScale})`;
+}
+
+function zoom(amount) {
+    mapScale = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, mapScale + amount));
+    applyMapTransform();
+}
+
+function pan(x, y) {
+    mapTranslateX += x; 
+    mapTranslateY += y; 
+    applyMapTransform();
+}
+
+function resetView() {
+    mapScale = 1; 
+    mapTranslateX = 0; 
+    mapTranslateY = 0; 
+    applyMapTransform();
 }
