@@ -353,3 +353,29 @@ header p {
 .map-controls button:hover { 
     background-color: var(--blue-hover); 
 }
+
+@media (max-width: 768px) {
+    body { 
+        height: auto; 
+        min-height: 100vh; 
+    }
+
+    .app-container { 
+        flex-direction: column; 
+        overflow: visible; 
+    }
+
+    .map-section { 
+        height: 450px; 
+        flex: none; 
+    }
+
+    .sidebar { 
+        width: 100%; 
+        height: auto;
+    }
+
+    .cart-panel {
+        max-height: 350px; 
+    }
+}
