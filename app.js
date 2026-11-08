@@ -113,6 +113,33 @@ function setupEventListeners() {
     document.getElementById('btn-move-left').addEventListener('click', () => pan(PAN_STEP, 0));
     document.getElementById('btn-move-right').addEventListener('click', () => pan(-PAN_STEP, 0));
     document.getElementById('btn-reset').addEventListener('click', resetView);
+
+    const mapWindow = document.getElementById('map-window');
+    let isDragging = false;
+    let startX, startY;
+
+    mapWindow.addEventListener('wheel', (e) => {
+        e.preventDefault(); 
+        const delta = e.deltaY > 0 ? -0.1 : 0.1;
+        zoom(delta);
+    }, { passive: false });
+
+    mapWindow.addEventListener('mousedown', (e) => {
+        if(e.target.classList.contains('seat')) return; 
+        isDragging = true;
+        startX = e.clientX - mapTranslateX;
+        startY = e.clientY - mapTranslateY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        mapTranslateX = e.clientX - startX;
+        mapTranslateY = e.clientY - startY;
+        applyMapTransform();
+    });
+
+    window.addEventListener('mouseup', () => { isDragging = false; });
 }
 
 function addToCart() {
